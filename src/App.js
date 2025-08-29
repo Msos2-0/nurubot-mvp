@@ -9,7 +9,7 @@ export default function App() {
 
   const append = (msg) => setMessages((m) => [...m, msg]);
 
-  // Updated sendMessage function
+  // ✅ Updated sendMessage with better error handling & correct keys
   const sendMessage = async () => {
     const text = input.trim();
     if (!text) return;
@@ -21,14 +21,19 @@ export default function App() {
       const resp = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text }) // changed key to "prompt"
+        body: JSON.stringify({ message: text }) // 👈 matches backend api/chat.js
       });
 
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server returned ${resp.status}`);
+      }
+
       const data = await resp.json();
-      const botText = data?.message || "Sorry, couldn't get a reply right now."; // changed to match API response
+      const botText = data?.reply || "Sorry, couldn't get a reply right now."; // 👈 matches api/chat.js response
       append({ sender: "bot", text: botText });
     } catch (err) {
-      append({ sender: "bot", text: "There was a connection problem. Try again shortly." });
+      append({ sender: "bot", text: `⚠️ ${err.message}` });
       console.error(err);
     } finally {
       setLoading(false);
