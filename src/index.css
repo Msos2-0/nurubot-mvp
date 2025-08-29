@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* optional: smooth page background fallback */
+html, body, #root { height: 100%; }
