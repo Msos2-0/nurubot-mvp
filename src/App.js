@@ -2,13 +2,14 @@ import React, { useState } from "react";
 
 export default function App() {
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi, I’m Nuru, i am here to help you on your journey of Mindfulness 👋. How are you feeling today?" },
+    { sender: "bot", text: "Hi, I’m Nuru, i am here to help you on your journey to better mental health & mindfulness 👋. How are you feeling today?" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const append = (msg) => setMessages((m) => [...m, msg]);
 
+  // Updated sendMessage function
   const sendMessage = async () => {
     const text = input.trim();
     if (!text) return;
@@ -20,11 +21,12 @@ export default function App() {
       const resp = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({ prompt: text }) // changed key to "prompt"
       });
+
       const data = await resp.json();
-      const botText = data?.reply || "Sorry, couldn't get a reply right now.";
-      append({ sender: "bot", text: botText, safety: data?.safety || false });
+      const botText = data?.message || "Sorry, couldn't get a reply right now."; // changed to match API response
+      append({ sender: "bot", text: botText });
     } catch (err) {
       append({ sender: "bot", text: "There was a connection problem. Try again shortly." });
       console.error(err);
@@ -47,7 +49,7 @@ export default function App() {
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`px-4 py-2 rounded-2xl shadow-md max-w-xs ${msg.sender === "user" ? "bg-blue-600 text-white rounded-br-none" : (msg.safety ? "bg-red-100 text-red-800 rounded-bl-none" : "bg-white text-gray-800 rounded-bl-none")}`}>
+            <div className={`px-4 py-2 rounded-2xl shadow-md max-w-xs ${msg.sender === "user" ? "bg-blue-600 text-white rounded-br-none" : "bg-white text-gray-800 rounded-bl-none"}`}>
               {msg.text}
             </div>
           </div>
@@ -76,4 +78,3 @@ export default function App() {
     </div>
   );
 }
-
