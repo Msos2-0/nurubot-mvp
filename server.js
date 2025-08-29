@@ -17,7 +17,7 @@ app.post('/api/chat', async (req, res) => {
       return res.json({ reply: crisisReply, safety: true });
     }
 
-    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
     if (!OPENAI_API_KEY) return res.status(500).json({ error: 'Missing OPENAI_API_KEY in .env' });
 
     const model = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
